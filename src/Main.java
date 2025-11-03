@@ -21,16 +21,22 @@ public class Main {
     public static void main(String[] args) {
         System.load("C:\\Users\\Leon\\Desktop\\opencv\\build\\java\\x64\\opencv_java480.dll");
 
+//        Mat mat = new Mat(4, 4, CvType.CV_8UC1);
+//        mat.put(0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+//        System.out.println("mat = " + mat);
+//        System.out.println("mat.dump() = \n" + mat.dump());
+//        Mat reshape = mat.reshape(3);
+//        System.out.println("reshape = " + reshape);
+//        System.out.println("reshape.dump() = \n" + reshape.dump());
+
+
         Mat imread = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\test_small.png");
-        Point point = new Point();
-        Mat submat = imread.submat(100, 300, 100, 300);
-        submat.locateROI(imread.size(), point);
-        System.out.println("point = " + point);
-
-        Imgproc.rectangle(imread, new Rect((int) point.x, (int) point.y, submat.width(), submat.height()), new Scalar(255, 0, 0));
-        HighGui.imshow("submat", submat);
-
         HighGui.imshow("imread", imread);
+        Mat t = imread.t();
+        HighGui.imshow("t", t);
+        Mat reshape = imread.reshape(1);
+        HighGui.imshow("reshape", reshape);
         HighGui.waitKey();
+
     }
 }
