@@ -21,11 +21,16 @@ public class Main {
     public static void main(String[] args) {
         System.load("C:\\Users\\Leon\\Desktop\\opencv\\build\\java\\x64\\opencv_java480.dll");
 
-        double[] vals = {1, 2, 3, 4, 5, 6, 7, 8};
-        Rect rect = new Rect(2, 5, 3, 4);
-        System.out.println("rect = " + rect);
-        System.out.println("rect.tl() = " + rect.tl());
-        System.out.println("rect.br() = " + rect.br());
-        System.out.println("rect.contains(new Point(5,9)) = " + rect.contains(new Point(4.9, 8.9)));
+        Mat imread = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\test_small.png");
+        Point point = new Point();
+        Mat submat = imread.submat(100, 300, 100, 300);
+        submat.locateROI(imread.size(), point);
+        System.out.println("point = " + point);
+
+        Imgproc.rectangle(imread, new Rect((int) point.x, (int) point.y, submat.width(), submat.height()), new Scalar(255, 0, 0));
+        HighGui.imshow("submat", submat);
+
+        HighGui.imshow("imread", imread);
+        HighGui.waitKey();
     }
 }
