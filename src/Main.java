@@ -21,21 +21,30 @@ public class Main {
     public static void main(String[] args) {
         System.load("C:\\Users\\Leon\\Desktop\\opencv\\build\\java\\x64\\opencv_java480.dll");
 
-//        Mat mat = new Mat(4, 4, CvType.CV_8UC1);
-//        mat.put(0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
-//        System.out.println("mat = " + mat);
-//        System.out.println("mat.dump() = \n" + mat.dump());
-//        Mat reshape = mat.reshape(3);
-//        System.out.println("reshape = " + reshape);
-//        System.out.println("reshape.dump() = \n" + reshape.dump());
+//        Mat mat1 = new Mat(3, 3, CvType.CV_8UC1);
+//        mat1.put(0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+//        Mat mat2 = new Mat(3, 3, CvType.CV_8UC1);
+//        mat2.put(0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+//        Mat dst = new Mat();
+//        Core.add(mat1, mat2, dst);
+//        System.out.println("dst.dump() = \n" + dst.dump());
 
 
-        Mat imread = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\test_small.png");
-        HighGui.imshow("imread", imread);
-        Mat t = imread.t();
-        HighGui.imshow("t", t);
-        Mat reshape = imread.reshape(1);
-        HighGui.imshow("reshape", reshape);
+//        Mat diff = new Mat();
+//        Core.absdiff(mat2, mat1, diff);
+//        System.out.println("diff.dump() = \n" + diff.dump());
+
+        Mat imread1 = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\dog.png");
+        Mat imread2 = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\jail.jpg");
+        Mat dst = new Mat();
+        Imgproc.resize(imread1, imread1, imread2.size());
+        System.out.println("imread1 = " + imread1);
+        System.out.println("imread2 = " + imread2);
+        Core.addWeighted(imread1, 0.5, imread2, 0.5, -50, dst);
+        Imgcodecs.imwrite("result.png", dst);
+        HighGui.imshow("dst", dst);
+
+
         HighGui.waitKey();
 
     }
