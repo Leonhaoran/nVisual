@@ -9,15 +9,16 @@ import java.util.*;
 // width / height = 1.83
 public class Main {
     public static void main(String[] args) {
-        System.load("C:\\Users\\Leon\\Desktop\\opencv\\build\\java\\x64\\opencv_java480.dll");
+        System.load("C:\\Users\\Leon\\Desktop\\opencv4.12.0\\build\\java\\x64\\opencv_java4120.dll");
 
-        Mat image = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\test.png");
+        Mat image = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\test_micro_3.png");
 
-        int tileWidth = 1000;
-        int tileHeight = 1000;
+        int tileWidth = 500;
+        int tileHeight = 500;
         int overlap = 100;
         int imageWidth = image.cols();
         int imageHeight = image.rows();
+        HashSet<Point> points = new HashSet<>();
         Map<Point, String> red = new HashMap<>();
         Map<Point, String> blue = new HashMap<>();
 
@@ -45,9 +46,10 @@ public class Main {
                 Mat dst = new Mat();
                 Imgproc.morphologyEx(threshold, dst, Imgproc.MORPH_GRADIENT, element);
 
+
                 // 使用Canny算法检测图像的边缘
                 Mat edges = new Mat();
-                Imgproc.Canny(dst, edges, 150, 200);
+                Imgproc.Canny(dst, edges, 50, 100);
 
                 // 轮廓检测
                 List<MatOfPoint> contours = new LinkedList<>();
@@ -61,16 +63,22 @@ public class Main {
                     double height = boundRect.height;
                     Point tl = new Point(boundRect.tl().x + x, boundRect.tl().y + y);
                     Point br = new Point(boundRect.br().x + x, boundRect.br().y + y);
-                    if (Math.abs(width / height - 1.83) < 0.5 && Math.abs(width - 68) < 3 && Math.abs(height - 37) < 3) {
+
+                    // test1: 68 37
+                    // test2: 238 117
+                    // test3: 37 21
+                    if (Math.abs(width - 68) < 3 && Math.abs(height - 37) < 3) {
                         String info = "width = " + width + "height = " + height;
-                        if (!red.containsKey(tl)) {
+                        if (!isDuplicate(tl.x, tl.y, points)) {
                             red.put(tl, info);
+                            points.add(tl);
                             Imgproc.rectangle(result, tl, br, new Scalar(0, 0, 255), 2);
                         }
-                    } else if (Math.abs(width / height - 1.36) < 0.5 && Math.abs(width - 67) < 3 && Math.abs(height - 49) < 3) {
+                    } else if (Math.abs(width - 67) < 3 && Math.abs(height - 49) < 3) {
                         String info = "width = " + width + "height = " + height;
-                        if (!red.containsKey(tl)) {
+                        if (!isDuplicate(tl.x, tl.y, points)) {
                             blue.put(tl, info);
+                            points.add(tl);
                             Imgproc.rectangle(result, tl, br, new Scalar(255, 0, 0), 2);
                         }
                     }
@@ -89,18 +97,30 @@ public class Main {
 
         Imgcodecs.imwrite("result.png", result);
 
-        for (Point key : red.keySet()){
-            System.out.println("key = " + key);
-            System.out.println("red.get(key) = " + red.get(key));
-        }
-
-        for (Point key : blue.keySet()){
-            System.out.println("key = " + key);
-            System.out.println("blue.get(key) = " + blue.get(key));
-        }
-
+//        for (Point key : red.keySet()){
+//            System.out.println("key = " + key);
+//            System.out.println("red.get(key) = " + red.get(key));
+//        }
+//
+//        for (Point key : blue.keySet()){
+//            System.out.println("key = " + key);
+//            System.out.println("blue.get(key) = " + blue.get(key));
+//        }
+        System.out.println("red.size() = " + red.size());
+        System.out.println("blue.size() = " + blue.size());
 //        HighGui.imshow("result", result);
 //        HighGui.waitKey();
+    }
+
+    public static boolean isDuplicate(double x, double y, HashSet<Point> points) {
+        for (Point point : points) {
+            double dx = point.x - x;
+            double dy = point.y - y;
+            if (dx * dx + dy * dy < 250) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 
