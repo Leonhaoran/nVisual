@@ -12,81 +12,86 @@ public class Main {
     public static void main(String[] args) {
         System.load("C:\\Users\\Leon\\Desktop\\opencv\\build\\java\\x64\\opencv_java480.dll");
 
-        Mat image = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\test_small_2_2.png");
+        Mat image = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\test_middle.png");
 
-        // 转换为灰度图
-        Mat gray = new Mat();
-        Imgproc.cvtColor(image, gray, Imgproc.COLOR_BGR2GRAY);
+        int tileWidth = 1000;
+        int tileHeight = 1000;
+        int imageWidth = image.cols();
+        int imageHeight = image.rows();
 
-//        HighGui.imshow("gray", gray);
-
-        // 图像反向二值化，去除噪点
-        Mat threshold = new Mat();
-        Imgproc.threshold(gray, threshold, 0, 255, Imgproc.THRESH_BINARY_INV | Imgproc.THRESH_OTSU);
-//        HighGui.imshow("threshold", threshold);
-
-        // 像素点加粗，让矩形闭合
-        Mat element = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3, 3));
-        Mat dst = new Mat();
-        Imgproc.morphologyEx(threshold, dst, Imgproc.MORPH_GRADIENT, element);
-//        HighGui.imshow("dst", dst);
-
-        // 使用Canny算法检测图像的边缘
-        Mat edges = new Mat();
-        Imgproc.Canny(dst, edges, 50, 100);
-
-        // 找轮廓
-        List<MatOfPoint> contours = new LinkedList<>();
-        Mat hierarchy = new Mat();
-        Imgproc.findContours(edges, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-
-        System.out.println(contours.size());
+        Mat result = image.clone();
         int total = 0;
-        for (MatOfPoint contour : contours) {
-            Rect boundRect = Imgproc.boundingRect(contour);
-            double width = boundRect.width;
-            double height = boundRect.height;
-            if (Math.abs(width / height - 1.83) < 0.5 && Math.abs(width - 68) < 3 && Math.abs(height - 37) < 3) {
-                total++;
-                System.out.println(total);
-                System.out.println("Red");
-                System.out.println("width = " + width);
-                System.out.println("height = " + height);
-                System.out.println("boundRect.tl() = " + boundRect.tl());
-                System.out.println("boundRect.br() = " + boundRect.br());
-                System.out.println();
-                Imgproc.rectangle(image, boundRect.tl(), boundRect.br(), new Scalar(0, 0, 255), 2);
-            } else if (Math.abs(width / height - 1.36) < 0.5 && Math.abs(width - 67) < 3 && Math.abs(height - 49) < 3) {
-                total++;
-                System.out.println(total);
-                System.out.println("Blue");
-                System.out.println("width = " + width);
-                System.out.println("height = " + height);
-                System.out.println("boundRect.tl() = " + boundRect.tl());
-                System.out.println("boundRect.br() = " + boundRect.br());
-                System.out.println();
-                Imgproc.rectangle(image, boundRect.tl(), boundRect.br(), new Scalar(255, 0, 0), 2);
+
+        for (int x = 0; x < imageWidth; x += tileWidth) {
+            for (int y = 0; y < imageHeight; y += tileHeight) {
+                int w = Math.min(tileWidth, imageWidth - x);
+                int h = Math.min(tileHeight, imageHeight - y);
+
+                Rect roi = new Rect(x, y, w, h);
+                Mat tile = new Mat(image, roi);
+
+                // 转换为灰度图
+                Mat gray = new Mat();
+                Imgproc.cvtColor(tile, gray, Imgproc.COLOR_BGR2GRAY);
+
+                // 二值化
+                Mat threshold = new Mat();
+                Imgproc.threshold(gray, threshold, 0, 255, Imgproc.THRESH_BINARY_INV | Imgproc.THRESH_OTSU);
+
+                // 形态学操作
+                Mat element = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3, 3));
+                Mat dst = new Mat();
+                Imgproc.morphologyEx(threshold, dst, Imgproc.MORPH_GRADIENT, element);
+
+                // 使用Canny算法检测图像的边缘
+                Mat edges = new Mat();
+                Imgproc.Canny(dst, edges, 50, 100);
+
+                // 轮廓检测
+                List<MatOfPoint> contours = new LinkedList<>();
+                Mat hierarchy = new Mat();
+                Imgproc.findContours(edges, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+
+                // 机柜检测规则
+                for (MatOfPoint contour : contours) {
+                    Rect boundRect = Imgproc.boundingRect(contour);
+                    double width = boundRect.width;
+                    double height = boundRect.height;
+                    if (Math.abs(width / height - 1.83) < 0.5 && Math.abs(width - 68) < 3 && Math.abs(height - 37) < 3) {
+                        total++;
+                        System.out.println(total);
+                        System.out.println("Red");
+                        System.out.println("width = " + width);
+                        System.out.println("height = " + height);
+                        System.out.println("boundRect.tl() = " + boundRect.tl());
+                        System.out.println("boundRect.br() = " + boundRect.br());
+                        System.out.println();
+                        Imgproc.rectangle(result, new Point(boundRect.tl().x + x, boundRect.tl().y + y), new Point(boundRect.br().x + x, boundRect.br().y + y), new Scalar(0, 0, 255), 2);
+                    } else if (Math.abs(width / height - 1.36) < 0.5 && Math.abs(width - 67) < 3 && Math.abs(height - 49) < 3) {
+                        total++;
+                        System.out.println(total);
+                        System.out.println("Blue");
+                        System.out.println("width = " + width);
+                        System.out.println("height = " + height);
+                        System.out.println("boundRect.tl() = " + boundRect.tl());
+                        System.out.println("boundRect.br() = " + boundRect.br());
+                        System.out.println();
+                        Imgproc.rectangle(result, new Point(boundRect.tl().x + x, boundRect.tl().y + y), new Point(boundRect.br().x + x, boundRect.br().y + y), new Scalar(255, 0, 0), 2);
+                    }
+                    contour.release();
+                }
+                gray.release();
+                threshold.release();
+                dst.release();
+                edges.release();
+                hierarchy.release();
+                tile.release();
             }
-//            else if (Math.abs(width / height - 1.83) < 1 && Math.abs(width - 69) < 10 && Math.abs(height - 38) < 10) {
-//                total++;
-//                System.out.println(total);
-//                System.out.println("Green");
-//                System.out.println("width = " + width);
-//                System.out.println("height = " + height);
-//                System.out.println("boundRect.tl() = " + boundRect.tl());
-//                System.out.println("boundRect.br() = " + boundRect.br());
-//                System.out.println();
-//                Imgproc.rectangle(image, boundRect.tl(), boundRect.br(), new Scalar(0, 255, 0), 2);
-//            }
-
-
-//            Imgproc.rectangle(image, boundRect.tl(), boundRect.br(), new Scalar(0, 255, 0), 2);
-
-
         }
 
-        Imgcodecs.imwrite("result.png", image);
-        HighGui.imshow("result", image);
+
+        Imgcodecs.imwrite("result.png", result);
+        HighGui.imshow("result", result);
         HighGui.waitKey();
     }
 }
