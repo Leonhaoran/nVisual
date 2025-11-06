@@ -38,8 +38,11 @@ public class Canny {
                 Mat tile = new Mat(image, roi);
 
                 // 转换为灰度图
+                // Y = 0.299R + 0.587G + 0.114B
                 Mat gray = new Mat();
                 Imgproc.cvtColor(tile, gray, Imgproc.COLOR_BGR2GRAY);
+
+
 
                 // 二值化
                 Mat threshold = new Mat();
@@ -76,7 +79,7 @@ public class Canny {
                     // test2: 216 116
                     // test2: 58 31
                     // test3: 267 155
-                    if (Math.abs(width - 58) < 3 && Math.abs(height - 31) < 3) {
+                    if (Math.abs(width - 68) < 3 && Math.abs(height - 37) < 3) {
                         String info = "width = " + width + "height = " + height;
                         if (!isDuplicate(tl.x, tl.y, points)) {
                             red.put(tl, info);
@@ -88,7 +91,7 @@ public class Canny {
                     // test1: 67 49
                     // test2: 216 156
                     // test2: 58 41
-                    else if (Math.abs(width - 58) < 3 && Math.abs(height - 41) < 3) {
+                    else if (Math.abs(width - 67) < 3 && Math.abs(height - 49) < 3) {
                         String info = "width = " + width + "height = " + height;
                         if (!isDuplicate(tl.x, tl.y, points)) {
                             blue.put(tl, info);
@@ -97,8 +100,9 @@ public class Canny {
                         }
                     }
                     // 墙体(绿色)
+                    // test1: 63 63
                     // test2: 54 54
-                    else if (Math.abs(width - 54) < 3 && Math.abs(height - 54) < 3) {
+                    else if (Math.abs(width - 63) < 3 && Math.abs(height - 63) < 3) {
                         String info = "width = " + width + "height = " + height;
                         if (!isDuplicate(tl.x, tl.y, points)) {
                             green.put(tl, info);
@@ -121,23 +125,23 @@ public class Canny {
 
         Imgcodecs.imwrite("result.png", result);
 
-        for (Point key : red.keySet()) {
-            System.out.println("key = " + key);
-            System.out.println("red.get(key) = " + red.get(key));
-        }
-        for (Point key : blue.keySet()) {
-            System.out.println("key = " + key);
-            System.out.println("blue.get(key) = " + blue.get(key));
-        }
-        for (Point key : green.keySet()) {
-            System.out.println("key = " + key);
-            System.out.println("green.get(key) = " + green.get(key));
-        }
-
-
-        System.out.println("red.size() = " + red.size());
-        System.out.println("blue.size() = " + blue.size());
-        System.out.println("green.size() = " + green.size());
+//        for (Point key : red.keySet()) {
+//            System.out.println("key = " + key);
+//            System.out.println("red.get(key) = " + red.get(key));
+//        }
+//        for (Point key : blue.keySet()) {
+//            System.out.println("key = " + key);
+//            System.out.println("blue.get(key) = " + blue.get(key));
+//        }
+//        for (Point key : green.keySet()) {
+//            System.out.println("key = " + key);
+//            System.out.println("green.get(key) = " + green.get(key));
+//        }
+//
+//
+//        System.out.println("red.size() = " + red.size());
+//        System.out.println("blue.size() = " + blue.size());
+//        System.out.println("green.size() = " + green.size());
 
     }
 
