@@ -23,6 +23,7 @@ public class Main {
 //        Template template = new Template(image, templateImage);
 //        template.match();
 
+
         // 方法2：Canny边缘检测
         Canny canny = new Canny(image, 500, 500, 100);
         canny.match();

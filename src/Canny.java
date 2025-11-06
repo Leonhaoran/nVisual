@@ -19,9 +19,6 @@ public class Canny {
     }
 
     public void match() {
-        int tileWidth = 500;
-        int tileHeight = 500;
-        int overlap = 100;
         int imageWidth = image.cols();
         int imageHeight = image.rows();
         HashSet<Point> points = new HashSet<>();
