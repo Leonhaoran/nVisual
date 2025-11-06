@@ -6,10 +6,10 @@ import org.opencv.imgproc.Imgproc;
 import java.util.*;
 
 public class Canny {
-    private Mat image;
-    private int tileWidth;
-    private int tileHeight;
-    private int overlap;
+    private final Mat image;
+    private final int tileWidth;
+    private final int tileHeight;
+    private final int overlap;
 
     public Canny(Mat image, int tileWidth, int tileHeight, int overlap) {
         this.image = image;
@@ -41,7 +41,6 @@ public class Canny {
                 // Y = 0.299R + 0.587G + 0.114B
                 Mat gray = new Mat();
                 Imgproc.cvtColor(tile, gray, Imgproc.COLOR_BGR2GRAY);
-
 
 
                 // 二值化

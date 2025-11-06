@@ -1,5 +1,4 @@
 import org.opencv.core.*;
-import org.opencv.highgui.HighGui;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
@@ -8,41 +7,63 @@ import java.util.HashSet;
 import java.util.List;
 
 public class Template {
-    private Mat targetImage;
-    private Mat templateImage;
+    private final Mat targetImage;
+    private final List<Mat> templateImages;
+    private final List<Scalar> scalars;
 
-    public Template(Mat targetImage, Mat templateImage) {
+    public Template(Mat targetImage, List<Mat> templateImages, List<Scalar> scalars) {
         this.targetImage = targetImage;
-        this.templateImage = templateImage;
+        this.templateImages = templateImages;
+        this.scalars = scalars;
     }
 
     public void match() {
-        Mat result = new Mat();
-        // 转换为灰度图
-        Mat gray = new Mat();
-        Imgproc.cvtColor(targetImage, gray, Imgproc.COLOR_BGR2GRAY);
-        Imgproc.cvtColor(templateImage, templateImage, Imgproc.COLOR_BGR2GRAY);
-        // 二值化
-        Mat thresh = new Mat();
-        Imgproc.threshold(gray, thresh, 0, 255, Imgproc.THRESH_BINARY_INV | Imgproc.THRESH_OTSU);
-        Imgproc.threshold(templateImage, templateImage, 0, 255, Imgproc.THRESH_BINARY_INV | Imgproc.THRESH_OTSU);
+        // 已匹配的点集和矩形
+        HashSet<Point> points = new HashSet<>();
+        List<List<Rect>> matchedRects = new ArrayList<>();
 
-        Imgproc.matchTemplate(thresh, templateImage, result, Imgproc.TM_CCOEFF_NORMED);
+        for (int i = 0; i < templateImages.size(); i++) {
+            matchedRects.add(new ArrayList<>());
+        }
 
-        List<Rect> matchedRects = new ArrayList<>();
-        double threshold = 0.45;
-        for (int y = 0; y < result.rows(); y++) {
-            for (int x = 0; x < result.cols(); x++) {
-                if (result.get(y, x)[0] > threshold ) {
-                    Point matchLoc = new Point(x, y);
-                    matchedRects.add(new Rect(matchLoc, new Size(templateImage.width(), templateImage.height())));
+        Mat result = targetImage.clone();
+        Mat similarity = new Mat();
+
+        int iteration = 0;
+        for (Mat templateImage : templateImages) {
+            // 转换为灰度图
+            Mat gray = new Mat();
+            Imgproc.cvtColor(targetImage, gray, Imgproc.COLOR_BGR2GRAY);
+            Imgproc.cvtColor(templateImage, templateImage, Imgproc.COLOR_BGR2GRAY);
+            // 二值化
+            Mat thresh = new Mat();
+            Imgproc.threshold(gray, thresh, 0, 255, Imgproc.THRESH_BINARY_INV | Imgproc.THRESH_OTSU);
+            Imgproc.threshold(templateImage, templateImage, 0, 255, Imgproc.THRESH_BINARY_INV | Imgproc.THRESH_OTSU);
+
+            Imgproc.matchTemplate(thresh, templateImage, similarity, Imgproc.TM_CCOEFF_NORMED);
+
+            double threshold = 0.5;
+            for (int y = 0; y < similarity.rows(); y++) {
+                for (int x = 0; x < similarity.cols(); x++) {
+                    if (similarity.get(y, x)[0] > threshold && !isDuplicate(x, y, points)) {
+                        Point matchLoc = new Point(x, y);
+                        points.add(matchLoc);
+                        matchedRects.get(iteration).add(new Rect(matchLoc, new Size(templateImage.width(), templateImage.height())));
+                    }
                 }
             }
+            iteration++;
         }
-        for (Rect rect : matchedRects) {
-            Imgproc.rectangle(targetImage, rect.tl(), rect.br(), new Scalar(0, 255, 0), 2);
+
+
+        for (int i = 0; i < matchedRects.size(); i++) {
+            List<Rect> list = matchedRects.get(i);
+            for (Rect rect : list) {
+                Imgproc.rectangle(result, rect.tl(), rect.br(), scalars.get(i), 2);
+            }
+
         }
-        Imgcodecs.imwrite("result.png", targetImage);
+        Imgcodecs.imwrite("result.png", result);
     }
 
     public boolean isDuplicate(double x, double y, HashSet<Point> points) {

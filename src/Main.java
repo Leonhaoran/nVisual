@@ -13,10 +13,21 @@ public class Main {
         Mat image = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\test.png");
         // 方法1：模板匹配
         // 1.1 直接从原图中截取模板，检测效果不精确，会因为截图影响检测结果
-        Mat templateImage = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\template.png");
+        List<Mat> mats = new ArrayList<>();
+
+        Mat templateImage1 = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\template.png");
+        Mat templateImage2 = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\template2.png");
+
+        mats.add(templateImage1);
+        mats.add(templateImage2);
 //        HighGui.imshow("templateImage", templateImage);
 //        HighGui.waitKey();
-        Template template = new Template(image, templateImage);
+        List<Scalar> scalars = new ArrayList<>();
+        scalars.add(new Scalar(255, 0, 0));
+        scalars.add(new Scalar(0, 255, 0));
+        scalars.add(new Scalar(0, 0, 255));
+
+        Template template = new Template(image, mats, scalars);
         template.match();
 
 
