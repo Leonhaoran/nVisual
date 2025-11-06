@@ -6,8 +6,6 @@ import org.opencv.imgproc.Imgproc;
 import java.util.*;
 
 public class Canny {
-
-
     private Mat image;
     private int tileWidth;
     private int tileHeight;
@@ -29,6 +27,7 @@ public class Canny {
         HashSet<Point> points = new HashSet<>();
         Map<Point, String> red = new HashMap<>();
         Map<Point, String> blue = new HashMap<>();
+        Map<Point, String> green = new HashMap<>();
 
         Mat result = image.clone();
 
@@ -79,6 +78,7 @@ public class Canny {
                     // test1: 68 37
                     // test2: 216 116
                     // test2: 58 31
+                    // test3: 267 155
                     if (Math.abs(width - 58) < 3 && Math.abs(height - 31) < 3) {
                         String info = "width = " + width + "height = " + height;
                         if (!isDuplicate(tl.x, tl.y, points)) {
@@ -90,13 +90,23 @@ public class Canny {
                     // 第二类机柜(蓝色)
                     // test1: 67 49
                     // test2: 216 156
-                    // test2: 60 43
+                    // test2: 58 41
                     else if (Math.abs(width - 58) < 3 && Math.abs(height - 41) < 3) {
                         String info = "width = " + width + "height = " + height;
                         if (!isDuplicate(tl.x, tl.y, points)) {
                             blue.put(tl, info);
                             points.add(tl);
                             Imgproc.rectangle(result, tl, br, new Scalar(255, 0, 0), 2);
+                        }
+                    }
+                    // 墙体(绿色)
+                    // test2: 54 54
+                    else if (Math.abs(width - 54) < 3 && Math.abs(height - 54) < 3) {
+                        String info = "width = " + width + "height = " + height;
+                        if (!isDuplicate(tl.x, tl.y, points)) {
+                            green.put(tl, info);
+                            points.add(tl);
+                            Imgproc.rectangle(result, tl, br, new Scalar(0, 255, 0), 2);
                         }
                     }
 //                    Imgproc.rectangle(result, tl, br, new Scalar(0, 255, 0), 1);
@@ -114,16 +124,23 @@ public class Canny {
 
         Imgcodecs.imwrite("result.png", result);
 
-        for (Point key : red.keySet()){
+        for (Point key : red.keySet()) {
             System.out.println("key = " + key);
             System.out.println("red.get(key) = " + red.get(key));
         }
-        for (Point key : blue.keySet()){
+        for (Point key : blue.keySet()) {
             System.out.println("key = " + key);
             System.out.println("blue.get(key) = " + blue.get(key));
         }
+        for (Point key : green.keySet()) {
+            System.out.println("key = " + key);
+            System.out.println("green.get(key) = " + green.get(key));
+        }
+
+
         System.out.println("red.size() = " + red.size());
         System.out.println("blue.size() = " + blue.size());
+        System.out.println("green.size() = " + green.size());
 
     }
 
