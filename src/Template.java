@@ -15,11 +15,23 @@ public class Template {
         this.templateImage = templateImage;
     }
 
-    public List<Rect> match() {
+    public void match() {
         Mat result = new Mat();
-        Imgproc.matchTemplate(targetImage, templateImage, result, Imgproc.TM_CCOEFF_NORMED);
+        // 转换为灰度图
+        Mat gray = new Mat();
+        Imgproc.cvtColor(targetImage, gray, Imgproc.COLOR_BGR2GRAY);
+
+        // 二值化
+        Mat thresh = new Mat();
+        Imgproc.threshold(gray, thresh, 0, 255, Imgproc.THRESH_BINARY_INV | Imgproc.THRESH_OTSU);
+
+
+        Imgproc.matchTemplate(thresh, templateImage, result, Imgproc.TM_CCOEFF_NORMED);
+
+
+
         List<Rect> matchedRects = new ArrayList<>();
-        double threshold = 0.8;
+        double threshold = 0.5;
         for (int y = 0; y < result.rows(); y++) {
             for (int x = 0; x < result.cols(); x++) {
                 if (result.get(y, x)[0] > threshold) {
@@ -28,13 +40,10 @@ public class Template {
                 }
             }
         }
-        return matchedRects;
-    }
-
-    public void displayMatches(List<Rect> matches) {
-        for (Rect rect: matches){
+        for (Rect rect : matchedRects) {
             Imgproc.rectangle(targetImage, rect.tl(), rect.br(), new Scalar(0, 255, 0), 2);
         }
         Imgcodecs.imwrite("result.png", targetImage);
+
     }
 }
