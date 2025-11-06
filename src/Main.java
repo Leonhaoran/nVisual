@@ -6,12 +6,19 @@ import org.opencv.imgproc.Imgproc;
 import java.util.*;
 
 // 机柜：600*1200 600*1100 600*1000 800*1200 800*1100 800*1000
-// width / height = 1.83
+
 public class Main {
     public static void main(String[] args) {
         System.load("C:\\Users\\Leon\\Desktop\\opencv4.12.0\\build\\java\\x64\\opencv_java4120.dll");
 
-        Mat image = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\test_micro_3.png");
+        Mat image = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\test.png");
+        Mat templateImage = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\template.png");
+
+        Template template = new Template(image, templateImage);
+        List<Rect> list = template.match();
+        template.displayMatches(list);
+
+        /*
 
         int tileWidth = 500;
         int tileHeight = 500;
@@ -69,20 +76,20 @@ public class Main {
                     // test3: 37 21
                     if (Math.abs(width - 68) < 3 && Math.abs(height - 37) < 3) {
                         String info = "width = " + width + "height = " + height;
-                        if (!isDuplicate(tl.x, tl.y, points)) {
+                        if (!Detection.isDuplicate(tl.x, tl.y, points)) {
                             red.put(tl, info);
                             points.add(tl);
                             Imgproc.rectangle(result, tl, br, new Scalar(0, 0, 255), 2);
                         }
                     } else if (Math.abs(width - 67) < 3 && Math.abs(height - 49) < 3) {
                         String info = "width = " + width + "height = " + height;
-                        if (!isDuplicate(tl.x, tl.y, points)) {
+                        if (!Detection.isDuplicate(tl.x, tl.y, points)) {
                             blue.put(tl, info);
                             points.add(tl);
                             Imgproc.rectangle(result, tl, br, new Scalar(255, 0, 0), 2);
                         }
                     }
-//                    Imgproc.rectangle(result, tl, br, new Scalar(0, 255, 0), 2);
+//                    Imgproc.rectangle(result, tl, br, new Scalar(0, 255, 0), 1);
                     contour.release();
                 }
                 gray.release();
@@ -110,17 +117,9 @@ public class Main {
         System.out.println("blue.size() = " + blue.size());
 //        HighGui.imshow("result", result);
 //        HighGui.waitKey();
-    }
 
-    public static boolean isDuplicate(double x, double y, HashSet<Point> points) {
-        for (Point point : points) {
-            double dx = point.x - x;
-            double dy = point.y - y;
-            if (dx * dx + dy * dy < 250) {
-                return true;
-            }
-        }
-        return false;
+
+         */
     }
 }
 
