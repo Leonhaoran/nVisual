@@ -70,7 +70,7 @@ public class Template {
         for (Point point : points) {
             double dx = point.x - x;
             double dy = point.y - y;
-            if (dx * dx + dy * dy < 250) {
+            if (dx * dx + dy * dy < 200) {
                 return true;
             }
         }
