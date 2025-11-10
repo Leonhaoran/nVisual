@@ -1,9 +1,14 @@
 import org.opencv.core.*;
+import org.opencv.core.Point;
 import org.opencv.highgui.HighGui;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
+import java.util.List;
 
 public class Canny {
     private final Mat image;

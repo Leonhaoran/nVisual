@@ -2,6 +2,8 @@ import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -42,16 +44,25 @@ public class Template {
 
             Imgproc.matchTemplate(thresh, templateImage, similarity, Imgproc.TM_CCOEFF_NORMED);
 
-            double threshold = 0.5;
-            for (int y = 0; y < similarity.rows(); y++) {
-                for (int x = 0; x < similarity.cols(); x++) {
-                    if (similarity.get(y, x)[0] > threshold && !isDuplicate(x, y, points)) {
-                        Point matchLoc = new Point(x, y);
-                        points.add(matchLoc);
-                        matchedRects.get(iteration).add(new Rect(matchLoc, new Size(templateImage.width(), templateImage.height())));
-                    }
-                }
+            try {
+                FileWriter fileWriter = new FileWriter("similarity.txt");
+                fileWriter.write(String.valueOf(similarity));
+
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+
+
+//            double threshold = 0.5;
+//            for (int y = 0; y < similarity.rows(); y++) {
+//                for (int x = 0; x < similarity.cols(); x++) {
+//                    if (similarity.get(y, x)[0] > threshold && !isDuplicate(x, y, points)) {
+//                        Point matchLoc = new Point(x, y);
+//                        points.add(matchLoc);
+//                        matchedRects.get(iteration).add(new Rect(matchLoc, new Size(templateImage.width(), templateImage.height())));
+//                    }
+//                }
+//            }
             iteration++;
         }
 
@@ -70,7 +81,7 @@ public class Template {
         for (Point point : points) {
             double dx = point.x - x;
             double dy = point.y - y;
-            if (dx * dx + dy * dy < 200) {
+            if (dx * dx + dy * dy < 250) {
                 return true;
             }
         }
