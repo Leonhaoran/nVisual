@@ -29,13 +29,14 @@ superglue = SuperGlue(superglue_config).to(device)
 # ==========================
 # 2. 读取图片
 # ==========================
-template_path = "template2.png"
+template_path = "template.png"
 scene_path = "test_micro_1.png"
 
 img1 = cv2.imread(template_path, cv2.IMREAD_GRAYSCALE)
 img2 = cv2.imread(scene_path, cv2.IMREAD_GRAYSCALE)
 cv2.imshow("Template", img1)
 cv2.imshow("Scene", img2)
+
 
 # 转成Tensor并归一化
 def preprocess(img):
