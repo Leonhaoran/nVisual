@@ -53,16 +53,16 @@ public class Template {
             }
 
 
-//            double threshold = 0.5;
-//            for (int y = 0; y < similarity.rows(); y++) {
-//                for (int x = 0; x < similarity.cols(); x++) {
-//                    if (similarity.get(y, x)[0] > threshold && !isDuplicate(x, y, points)) {
-//                        Point matchLoc = new Point(x, y);
-//                        points.add(matchLoc);
-//                        matchedRects.get(iteration).add(new Rect(matchLoc, new Size(templateImage.width(), templateImage.height())));
-//                    }
-//                }
-//            }
+            double threshold = 0.6;
+            for (int y = 0; y < similarity.rows(); y++) {
+                for (int x = 0; x < similarity.cols(); x++) {
+                    if (similarity.get(y, x)[0] > threshold && !isDuplicate(x, y, points)) {
+                        Point matchLoc = new Point(x, y);
+                        points.add(matchLoc);
+                        matchedRects.get(iteration).add(new Rect(matchLoc, new Size(templateImage.width(), templateImage.height())));
+                    }
+                }
+            }
             iteration++;
         }
 
