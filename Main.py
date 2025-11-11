@@ -25,24 +25,23 @@ superglue_config = {
 
 superpoint = SuperPoint(superpoint_config).to(device)
 superglue = SuperGlue(superglue_config).to(device)
-print("✅ Models loaded successfully.")
 
 # ==========================
 # 2. 读取图片
 # ==========================
-template_path = "template.png"
+template_path = "template2.png"
 scene_path = "test_micro_1.png"
 
 img1 = cv2.imread(template_path, cv2.IMREAD_GRAYSCALE)
 img2 = cv2.imread(scene_path, cv2.IMREAD_GRAYSCALE)
-
-if img1 is None or img2 is None:
-    raise FileNotFoundError("❌ 无法读取图片，请检查路径！")
+cv2.imshow("Template", img1)
+cv2.imshow("Scene", img2)
 
 # 转成Tensor并归一化
 def preprocess(img):
     img = torch.from_numpy(img / 255.).float()[None, None].to(device)
     return img
+
 
 img1_t = preprocess(img1)
 img2_t = preprocess(img2)
@@ -56,7 +55,7 @@ with torch.no_grad():
 
 # 检查关键点数量
 if pred1['keypoints'][0].shape[0] == 0 or pred2['keypoints'][0].shape[0] == 0:
-    raise RuntimeError("❌ 未检测到关键点，请检查输入图片。")
+    raise RuntimeError("未检测到关键点，请检查输入图片。")
 
 # ==========================
 # 4. SuperGlue匹配
@@ -83,7 +82,8 @@ kpts1 = pred2['keypoints'][0].cpu().numpy()
 matched_kpts0 = kpts0[valid]
 matched_kpts1 = kpts1[matches[valid]]
 
-print(f"✅ 匹配到 {len(matched_kpts0)} 对关键点")
+print(f"匹配到 {len(matched_kpts0)} 对关键点")
+
 
 # ==========================
 # 5. 可视化匹配结果
@@ -104,6 +104,7 @@ def draw_matches(img1, img2, kpts0, kpts1):
         cv2.line(vis, (int(x0), int(y0)), (int(x1 + w1), int(y1)), color, 1)
 
     return vis
+
 
 vis = draw_matches(img1, img2, matched_kpts0, matched_kpts1)
 cv2.imwrite("result_matches.jpg", vis)
