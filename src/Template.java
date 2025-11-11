@@ -31,32 +31,29 @@ public class Template {
         Mat result = targetImage.clone();
         Mat similarity = new Mat();
 
+        Mat gray = new Mat();
+        Imgproc.cvtColor(targetImage, gray, Imgproc.COLOR_BGR2GRAY);
+        Mat thresh = new Mat();
+        Imgproc.threshold(gray, thresh, 0, 255, Imgproc.THRESH_BINARY_INV | Imgproc.THRESH_OTSU);
+
+        // TODO 使用JFrame允许用户自己调整threshold，多个模板检测情况在，threshold很难统一
+
         int iteration = 0;
         for (Mat templateImage : templateImages) {
+
+            double inaccuracy = Math.min(templateImage.width(), templateImage.height());
+            inaccuracy = inaccuracy * inaccuracy * 0.9;
             // 转换为灰度图
-            Mat gray = new Mat();
-            Imgproc.cvtColor(targetImage, gray, Imgproc.COLOR_BGR2GRAY);
             Imgproc.cvtColor(templateImage, templateImage, Imgproc.COLOR_BGR2GRAY);
             // 二值化
-            Mat thresh = new Mat();
-            Imgproc.threshold(gray, thresh, 0, 255, Imgproc.THRESH_BINARY_INV | Imgproc.THRESH_OTSU);
             Imgproc.threshold(templateImage, templateImage, 0, 255, Imgproc.THRESH_BINARY_INV | Imgproc.THRESH_OTSU);
 
             Imgproc.matchTemplate(thresh, templateImage, similarity, Imgproc.TM_CCOEFF_NORMED);
 
-            try {
-                FileWriter fileWriter = new FileWriter("similarity.txt");
-                fileWriter.write(String.valueOf(similarity));
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
-            double threshold = 0.6;
+            double threshold = 0.5;
             for (int y = 0; y < similarity.rows(); y++) {
                 for (int x = 0; x < similarity.cols(); x++) {
-                    if (similarity.get(y, x)[0] > threshold && !isDuplicate(x, y, points)) {
+                    if (similarity.get(y, x)[0] > threshold && !isDuplicate(x, y, points, inaccuracy)) {
                         Point matchLoc = new Point(x, y);
                         points.add(matchLoc);
                         matchedRects.get(iteration).add(new Rect(matchLoc, new Size(templateImage.width(), templateImage.height())));
@@ -72,16 +69,15 @@ public class Template {
             for (Rect rect : list) {
                 Imgproc.rectangle(result, rect.tl(), rect.br(), scalars.get(i), 2);
             }
-
         }
         Imgcodecs.imwrite("result.png", result);
     }
 
-    public boolean isDuplicate(double x, double y, HashSet<Point> points) {
+    public boolean isDuplicate(double x, double y, HashSet<Point> points, double inaccuracy) {
         for (Point point : points) {
             double dx = point.x - x;
             double dy = point.y - y;
-            if (dx * dx + dy * dy < 250) {
+            if (dx * dx + dy * dy < inaccuracy) {
                 return true;
             }
         }
