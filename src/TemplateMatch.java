@@ -2,18 +2,16 @@ import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-public class Template {
+public class TemplateMatch {
     private final Mat targetImage;
     private final List<Mat> templateImages;
     private final List<Scalar> scalars;
 
-    public Template(Mat targetImage, List<Mat> templateImages, List<Scalar> scalars) {
+    public TemplateMatch(Mat targetImage, List<Mat> templateImages, List<Scalar> scalars) {
         this.targetImage = targetImage;
         this.templateImages = templateImages;
         this.scalars = scalars;
@@ -36,7 +34,6 @@ public class Template {
         Mat thresh = new Mat();
         Imgproc.threshold(gray, thresh, 0, 255, Imgproc.THRESH_BINARY_INV | Imgproc.THRESH_OTSU);
 
-        // TODO 使用JFrame允许用户自己调整threshold，多个模板检测情况在，threshold很难统一
 
         int iteration = 0;
         for (Mat templateImage : templateImages) {
