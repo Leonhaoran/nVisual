@@ -1,15 +1,15 @@
 import org.opencv.core.Mat;
+import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.highgui.HighGui;
 import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 
 public class Main {
 
@@ -19,90 +19,158 @@ public class Main {
         // 读取图片
         Mat image = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\test.png");
         BufferedImage bufferedImage = (BufferedImage) HighGui.toBufferedImage(image);
+        Mat template1 = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\template.png");
+        Mat template2 = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\template_2.png");
+        Mat template3 = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\template_3.png");
+        Mat copy = image.clone();
 
         // 主窗口
-        JFrame frame = new JFrame("图片放缩与平移 + 参数调节");
+        JFrame frame = new JFrame("图片显示 + 参数输入面板");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
 
-        // 图片显示面板（自定义类）
-        ImageZoomPanel panel = new ImageZoomPanel(bufferedImage);
-        frame.add(panel, BorderLayout.CENTER);
+        // 图片显示面板（支持缩放和平移）
+        ImageZoomPanel imageZoomPanel = new ImageZoomPanel(bufferedImage);
+        frame.add(imageZoomPanel, BorderLayout.CENTER);
 
-        // ======= 右侧滑块区域 =======
-        JPanel sliderPanel = new JPanel();
-        sliderPanel.setLayout(new BoxLayout(sliderPanel, BoxLayout.Y_AXIS)); // 垂直排列
-        sliderPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        sliderPanel.setPreferredSize(new Dimension(300, 0));
+        // ======= 右侧参数输入面板 =======
+        JPanel rightPanel = new JPanel();
+        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+        rightPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        rightPanel.setPreferredSize(new Dimension(300, 0));
 
-        // 创建三个滑块
-        JSlider slider1 = createSlider("置信度1", 0, 100, 50);
-        JSlider slider2 = createSlider("置信度2", 0, 100, 50);
-        JSlider slider3 = createSlider("置信度3", 0, 100, 50);
+        // 对图片进行预处理
+        TemplateMatch templateMatch1 = new TemplateMatch(image.clone(), template1);
+        templateMatch1.pre();
+        TemplateMatch templateMatch2 = new TemplateMatch(image.clone(), template2);
+        templateMatch2.pre();
+        TemplateMatch templateMatch3 = new TemplateMatch(image.clone(), template3);
+        templateMatch3.pre();
 
-        // 将滑块加入面板
-        sliderPanel.add(slider1);
-        sliderPanel.add(Box.createVerticalStrut(20)); // 间距
-        sliderPanel.add(slider2);
-        sliderPanel.add(Box.createVerticalStrut(20));
-        sliderPanel.add(slider3);
+        final HashSet<Rect>[] hashSet1 = new HashSet[]{new HashSet<>()};
+        final HashSet<Rect>[] hashSet2 = new HashSet[]{new HashSet<>()};
+        final HashSet<Rect>[] hashSet3 = new HashSet[]{new HashSet<>()};
+        // 添加三个输入模块
+        rightPanel.add(createInputPanel("置信度1", new InputCallback() {
+            @Override
+            public void onConfirm(String text) {
+                templateMatch1.setConfidence(Integer.parseInt(text) / 100.0);
+                hashSet1[0] = templateMatch1.match();
 
-        // 将右侧面板放在 EAST
-        frame.add(sliderPanel, BorderLayout.EAST);
+                Mat display = copy.clone();
+                for (Rect rect : hashSet1[0]) {
+                    Imgproc.rectangle(display, rect.tl(), rect.br(), new Scalar(255, 0, 0), 2);
+                }
+                for (Rect rect : hashSet2[0]) {
+                    Imgproc.rectangle(display, rect.tl(), rect.br(), new Scalar(0, 255, 0), 2);
+                }
+                for (Rect rect : hashSet3[0]) {
+                    Imgproc.rectangle(display, rect.tl(), rect.br(), new Scalar(0, 0, 255), 2);
+                }
 
-        // 自适应屏幕
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        frame.setSize(screenSize);
+
+                imageZoomPanel.setImage((BufferedImage) HighGui.toBufferedImage(display));
+                frame.repaint();
+            }
+        }));
+        rightPanel.add(Box.createVerticalStrut(20));
+
+        rightPanel.add(createInputPanel("置信度2", new InputCallback() {
+            @Override
+            public void onConfirm(String text) {
+                templateMatch2.setConfidence(Integer.parseInt(text) / 100.0);
+                hashSet2[0] = templateMatch2.match();
+
+                Mat display = copy.clone();
+                for (Rect rect : hashSet1[0]) {
+                    Imgproc.rectangle(display, rect.tl(), rect.br(), new Scalar(255, 0, 0), 2);
+                }
+                for (Rect rect : hashSet2[0]) {
+                    Imgproc.rectangle(display, rect.tl(), rect.br(), new Scalar(0, 255, 0), 2);
+                }
+                for (Rect rect : hashSet3[0]) {
+                    Imgproc.rectangle(display, rect.tl(), rect.br(), new Scalar(0, 0, 255), 2);
+                }
+
+
+                imageZoomPanel.setImage((BufferedImage) HighGui.toBufferedImage(display));
+                frame.repaint();
+            }
+        }));
+        rightPanel.add(Box.createVerticalStrut(20));
+
+        rightPanel.add(createInputPanel("置信度3", new InputCallback() {
+            @Override
+            public void onConfirm(String text) {
+                templateMatch3.setConfidence(Integer.parseInt(text) / 100.0);
+                hashSet3[0] = templateMatch3.match();
+
+                Mat display = copy.clone();
+                for (Rect rect : hashSet1[0]) {
+                    Imgproc.rectangle(display, rect.tl(), rect.br(), new Scalar(255, 0, 0), 2);
+                }
+                for (Rect rect : hashSet2[0]) {
+                    Imgproc.rectangle(display, rect.tl(), rect.br(), new Scalar(0, 255, 0), 2);
+                }
+                for (Rect rect : hashSet3[0]) {
+                    Imgproc.rectangle(display, rect.tl(), rect.br(), new Scalar(0, 0, 255), 2);
+                }
+
+
+                imageZoomPanel.setImage((BufferedImage) HighGui.toBufferedImage(display));
+                frame.repaint();
+            }
+        }));
+
+        frame.add(rightPanel, BorderLayout.EAST);
+
+        // 全屏显示
+        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+        frame.setSize(screen);
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.setVisible(true);
-
-        // 模板匹配部分
-        Mat target = image.clone();
-
-        Mat template1 = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\template.png");
-        Mat template2 = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\template2.png");
-
-        List<Mat> templates = new ArrayList<>();
-        templates.add(template1);
-        templates.add(template2);
-
-        List<Scalar> scalars = new ArrayList<>();
-        scalars.add(new Scalar(255, 0, 0));
-        scalars.add(new Scalar(0, 255, 0));
-
-        TemplateMatch templateMatch = new TemplateMatch(target, templates, scalars);
-        templateMatch.match();
-
-        // 监听滑块事件
-        slider1.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                JSlider source = (JSlider) e.getSource();
-
-            }
-        });
     }
 
     /**
-     * 工具方法：创建带标签的滑块
+     * 创建单个输入模块（带标签、文本框、确认按钮）
      */
-    private static JSlider createSlider(String label, int min, int max, int init) {
-        JLabel lbl = new JLabel(label + ": " + init, SwingConstants.CENTER);
-        JSlider slider = new JSlider(JSlider.HORIZONTAL, min, max, init);
-        slider.setMajorTickSpacing(10);
-        slider.setMinorTickSpacing(5);
-        slider.setPaintTicks(true);
-        slider.setPaintLabels(true);
+    private static JPanel createInputPanel(final String labelText, final InputCallback callback) {
+        final JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout(5, 5));
 
-        slider.addChangeListener(e -> {
-            lbl.setText(label + ": " + ((JSlider) e.getSource()).getValue());
+        final JLabel label = new JLabel(labelText + ":");
+        final JTextField textField = new JTextField();
+        final JButton button = new JButton("确认");
+
+        // 点击按钮时触发回调
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String text = textField.getText().trim();
+                callback.onConfirm(text);
+            }
         });
 
-        JPanel wrapper = new JPanel();
-        wrapper.setLayout(new BorderLayout());
-        wrapper.add(lbl, BorderLayout.NORTH);
-        wrapper.add(slider, BorderLayout.CENTER);
+        // 回车键触发
+        textField.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String text = textField.getText().trim();
+                callback.onConfirm(text);
+            }
+        });
 
-        return slider;
+        panel.add(label, BorderLayout.NORTH);
+        panel.add(textField, BorderLayout.CENTER);
+        panel.add(button, BorderLayout.SOUTH);
+
+        return panel;
+    }
+
+    /**
+     * 简单接口，用于处理确认事件
+     */
+    public interface InputCallback {
+        void onConfirm(String text);
     }
 }

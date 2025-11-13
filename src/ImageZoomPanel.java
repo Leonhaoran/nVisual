@@ -69,4 +69,7 @@ public class ImageZoomPanel extends JPanel {
         return super.getPreferredSize();
     }
 
+    public void setImage(BufferedImage image) {
+        this.image = image;
+    }
 }
