@@ -1,13 +1,15 @@
 import org.opencv.core.*;
-import org.opencv.highgui.HighGui;
-import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 
+/*
+ targetImage 待检测图片
+ templateImage 模板图片
+ confidence 置信度
+ inaccuracy 误差
+ similarity 存放模板匹配的结果
+ */
 public class TemplateMatch {
     private Mat targetImage;
     private Mat templateImage;
@@ -24,6 +26,8 @@ public class TemplateMatch {
         this.similarity = new Mat();
     }
 
+    // 预处理
+    // 将待检测图片和模板图片先转换为灰度图，然后在进行二值化，将其转换为黑白图片，便于后续检测
     public void pre() {
         Imgproc.cvtColor(targetImage, targetImage, Imgproc.COLOR_BGR2GRAY);
         Imgproc.threshold(targetImage, targetImage, 0, 255, Imgproc.THRESH_BINARY_INV | Imgproc.THRESH_OTSU);
@@ -32,10 +36,9 @@ public class TemplateMatch {
         Imgproc.threshold(templateImage, templateImage, 0, 255, Imgproc.THRESH_BINARY_INV | Imgproc.THRESH_OTSU);
     }
 
-
+    // 模板匹配
     public HashSet<Rect> match() {
-
-        // 已匹配的点集和矩形
+        // 匹配的点集（即矩形的左上角）和矩形
         HashSet<Point> points = new HashSet<>();
         HashSet<Rect> matchedRects = new HashSet<>();
         Imgproc.matchTemplate(targetImage, templateImage, similarity, Imgproc.TM_CCOEFF_NORMED);
@@ -49,17 +52,9 @@ public class TemplateMatch {
                 }
             }
         }
-
-
         return matchedRects;
     }
 
-//    public Mat draw(HashSet<Rect> matchedRects1, HashSet<Rect> matchedRects2, HashSet<Rect> matchedRects3, Mat display) {
-//        for (Rect rect : matchedRects1) {
-//            Imgproc.rectangle(display, rect.tl(), rect.br(), scalar, 2);
-//        }
-//        return display;
-//    }
 
     public boolean isDuplicate(double x, double y, HashSet<Point> points, double inaccuracy) {
         for (Point point : points) {

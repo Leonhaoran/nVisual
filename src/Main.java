@@ -22,12 +22,14 @@ public class Main {
     public static void main(String[] args) {
         System.load("C:\\Users\\Leon\\Desktop\\opencv4.12.0\\build\\java\\x64\\opencv_java4120.dll");
 
-        // 读取图片
-        Mat image = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\test3\\test3.png");
+        // 读取待检测图片
+        Mat image = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\test\\test.png");
+        // Swing组件显示图片需要转换为bufferedImage
         BufferedImage bufferedImage = (BufferedImage) HighGui.toBufferedImage(image);
-        Mat template1 = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\test3\\template3.png");
-        Mat template2 = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\test3\\template3_2.png");
-        Mat template3 = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\test3\\template3_3.png");
+        // 模板图片（应该允许有多个模板图片）
+        Mat template1 = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\test\\template.png");
+        Mat template2 = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\test\\template_2.png");
+        Mat template3 = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\test\\template_3.png");
         Mat copy = image.clone();
 
         // 主窗口
@@ -45,7 +47,7 @@ public class Main {
         rightPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         rightPanel.setPreferredSize(new Dimension(300, 0));
 
-        // 对图片进行预处理
+        // 对模板图片进行预处理
         TemplateMatch templateMatch1 = new TemplateMatch(image.clone(), template1);
         templateMatch1.pre();
         TemplateMatch templateMatch2 = new TemplateMatch(image.clone(), template2);
@@ -60,9 +62,12 @@ public class Main {
         rightPanel.add(createInputPanel("置信度1", new InputCallback() {
             @Override
             public void onConfirm(String text) {
+                // 设置置信度，置信度范围(0,1)
                 templateMatch1.setConfidence(Integer.parseInt(text) / 100.0);
+                // 指定模板在待检测图片上进行匹配
                 hashSet1[0] = templateMatch1.match();
 
+                // 在待检测图片上绘制目标的轮廓
                 Mat display = copy.clone();
                 for (Rect rect : hashSet1[0]) {
                     Imgproc.rectangle(display, rect.tl(), rect.br(), new Scalar(255, 0, 0), 2);
