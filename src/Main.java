@@ -11,17 +11,23 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.util.HashSet;
 
+/*
+环境依赖：
+opencv      4.12.0
+sdk         corretto-17
+ */
+
 public class Main {
 
     public static void main(String[] args) {
         System.load("C:\\Users\\Leon\\Desktop\\opencv4.12.0\\build\\java\\x64\\opencv_java4120.dll");
 
         // 读取图片
-        Mat image = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\test.png");
+        Mat image = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\test3\\test3.png");
         BufferedImage bufferedImage = (BufferedImage) HighGui.toBufferedImage(image);
-        Mat template1 = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\template.png");
-        Mat template2 = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\template_2.png");
-        Mat template3 = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\template_3.png");
+        Mat template1 = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\test3\\template3.png");
+        Mat template2 = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\test3\\template3_2.png");
+        Mat template3 = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\test3\\template3_3.png");
         Mat copy = image.clone();
 
         // 主窗口
