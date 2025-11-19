@@ -8,6 +8,11 @@
 
 OpenCV 4.12.0
 
+    1./usr/local/lib目录中加入图中所示文件
+![img.png](img.png)
+    
+    2.System.load("/home/nvisual/libopencv_java4120.so");
+
 sdk corretto-17
 
 ### 输入
