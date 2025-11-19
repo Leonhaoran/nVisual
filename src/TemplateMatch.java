@@ -33,6 +33,7 @@ public class TemplateMatch {
         Imgproc.cvtColor(targetImage, targetImage, Imgproc.COLOR_BGR2GRAY);
         Imgproc.threshold(targetImage, targetImage, 0, 255, Imgproc.THRESH_BINARY_INV | Imgproc.THRESH_OTSU);
 
+        // 去除模板图片四周的空白
         Mat gray = new Mat();
         Imgproc.cvtColor(templateImage, gray, Imgproc.COLOR_BGR2GRAY);
         Mat thresh = new Mat();
@@ -81,7 +82,14 @@ public class TemplateMatch {
         return false;
     }
 
+    // 置信度[0,1]，置信度越高，符合的图片越少
     public void setConfidence(double confidence) {
-        this.confidence = confidence;
+        if (confidence >= 1.0) {
+            this.confidence = 1;
+        } else if (confidence <= 0.0) {
+            this.confidence = 0;
+        } else {
+            this.confidence = confidence;
+        }
     }
 }

@@ -7,6 +7,11 @@
 ### 环境依赖
 
 OpenCV 4.12.0
+    
+    1.项目结构 -> 库 -> 添加
+![img.png](img.png)
+
+    2.System.load("C:\\Users\\Leon\\Desktop\\opencv4.12.0\\build\\java\\x64\\opencv_java4120.dll");
 
 sdk corretto-17
 
