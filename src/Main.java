@@ -24,6 +24,7 @@ public class Main {
 //        System.load("C:\\Users\\Leon\\Desktop\\opencv4.12.0\\build\\java\\x64\\opencv_java4120.dll");
 
 
+
         // 读取待检测图片
         Mat image = Imgcodecs.imread("/home/nvisual/nVisual/test/test.png");
 //        Mat image = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\test\\test.png");
