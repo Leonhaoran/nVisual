@@ -33,8 +33,19 @@ public class TemplateMatch {
         Imgproc.cvtColor(targetImage, targetImage, Imgproc.COLOR_BGR2GRAY);
         Imgproc.threshold(targetImage, targetImage, 0, 255, Imgproc.THRESH_BINARY_INV | Imgproc.THRESH_OTSU);
 
+        Mat gray = new Mat();
+        Imgproc.cvtColor(templateImage, gray, Imgproc.COLOR_BGR2GRAY);
+        Mat thresh = new Mat();
+        Imgproc.threshold(gray, thresh, 245, 255, Imgproc.THRESH_BINARY_INV);
+        Mat points = new Mat();
+        Core.findNonZero(thresh, points);
+        Rect rect = Imgproc.boundingRect(points);
+        templateImage = new Mat(templateImage, rect);
+
         Imgproc.cvtColor(templateImage, templateImage, Imgproc.COLOR_BGR2GRAY);
         Imgproc.threshold(templateImage, templateImage, 0, 255, Imgproc.THRESH_BINARY_INV | Imgproc.THRESH_OTSU);
+
+
     }
 
     // 模板匹配
