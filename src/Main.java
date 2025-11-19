@@ -20,7 +20,7 @@ sdk         corretto-17
 public class Main {
 
     public static void main(String[] args) {
-        System.load("/usr/local/share/java/opencv4/libopencv_java4120.so");
+        System.load("/home/nvisual/libopencv_java4120.so");
 //        System.load("C:\\Users\\Leon\\Desktop\\opencv4.12.0\\build\\java\\x64\\opencv_java4120.dll");
 
 
