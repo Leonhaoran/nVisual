@@ -23,7 +23,7 @@ public class Main {
         System.load("C:\\Users\\Leon\\Desktop\\opencv4.12.0\\build\\java\\x64\\opencv_java4120.dll");
 
         // 读取待检测图片
-        Mat image = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\test\\test.png");
+        Mat image = Imgcodecs.imread("C:\\Users\\Leon\\Desktop\\nVisual\\test\\test_small_2_1.png");
         // Swing组件显示图片需要转换为bufferedImage
         BufferedImage bufferedImage = (BufferedImage) HighGui.toBufferedImage(image);
         // 模板图片（应该允许有多个模板图片）

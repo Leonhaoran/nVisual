@@ -55,6 +55,7 @@ public class TemplateMatch {
         HashSet<Point> points = new HashSet<>();
         HashSet<Rect> matchedRects = new HashSet<>();
         Imgproc.matchTemplate(targetImage, templateImage, similarity, Imgproc.TM_CCOEFF_NORMED);
+        int total = 0;
         for (int y = 0; y < similarity.rows(); y++) {
             for (int x = 0; x < similarity.cols(); x++) {
                 if (similarity.get(y, x)[0] > confidence && !isDuplicate(x, y, points, inaccuracy)) {
@@ -62,6 +63,13 @@ public class TemplateMatch {
                     Point matchLoc = new Point(x, y);
                     points.add(matchLoc);
                     matchedRects.add(new Rect(matchLoc, new Size(templateImage.width(), templateImage.height())));
+                    total++;
+                    System.out.println("total = " + total);
+                    System.out.println("x = " + x);
+                    System.out.println("y = " + y);
+                    System.out.println("templateImage.width() = " + templateImage.width());
+                    System.out.println("templateImage.height() = " + templateImage.height());
+                    System.out.println();
                 }
             }
         }
